@@ -1,0 +1,34 @@
+[user]
+    name = Sergei Orlov
+    email = sergeio@aweber.com
+[diff]
+[color]
+    ui = auto
+[alias]
+    aa = add --all
+    amend = commit --amend
+    br = branch
+    ci = commit
+    cma = commit -a -m
+    co = checkout
+    dc = diff --cached
+    del = branch -d
+    di = diff
+    head = log -1
+    # Show files ignored by git:
+    ign = ls-files -o -i --exclude-standard
+    lg = log -p
+    lol = log --graph --decorate --pretty=oneline --abbrev-commit
+    lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+    ls = ls-files
+    po = pull origin
+    pr = remote prune origin
+    unadd = reset head
+    rim = rebase -i master
+    s = status -s
+[merge]
+	tool = opendiff
+[branch]
+    autosetupmerge = true
+[mergetool "vimdiff3"]
+	cmd = vim -f -d -c \"wincmd J\" \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
