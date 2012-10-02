@@ -71,8 +71,6 @@ nmap \b mxoimport pdb; pdb.set_trace()<esc>`x
 nmap \p :s/\vprint (.*)/pprint\(\1\)<CR>mxOfrom pprint import pprint<esc>`x
 nmap \P :s/\vpprint\((.*)\)/print \1/<CR>kdd
 
-map <C-n> :BikeExtract<CR>
-
 " forgot sudo?
 cmap W!! %!sudo tee > /dev/null %
 
