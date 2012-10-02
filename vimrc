@@ -182,4 +182,3 @@ if has("gui_running")
     " STOP BLINKING, YOU PIECE OF ----
     set guicursor=a:blinkon0
 endif
-"colors peaksea
