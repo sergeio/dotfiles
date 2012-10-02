@@ -6,8 +6,9 @@ pull_request(){
 
 testfile(){
     ulimit -n 1024
-    source bin/activate
-    find reputation tests -type f -name '*.py' | REPUTATION_CONF=configuration/development.conf watchfiles bin/nosetests $@
+    project=$(pwd | sed -e 's/.*\///' -e 's/-/_/g')
+    upper_project=$(echo $project | tr a-z A-Z)
+    find $project tests -type f -name '*.py' | watchfiles "source bin/activate; eval ${upper_project}_CONF=configuration/development.conf bin/nosetests $@"
 }
 
 wiki(){
@@ -81,7 +82,7 @@ accounts_notified_16_days_ago_but_not_yesterday(){
 }
 
 convert(){
-    curl -s 'reputation/v1/reputations?filter='$1':'$3'&limit=1' |
+    curl -s 'http://puppet-bridge.colo.lair:11003/v1/reputations?filter='$1':'$3'&limit=1' |
     python -c "import json; print json.loads(raw_input())['content'][0][\"$2\"]"
 }
 
