@@ -182,3 +182,5 @@ if has("gui_running")
     " STOP BLINKING, YOU PIECE OF ----
     set guicursor=a:blinkon0
 endif
+
+imap IFF if __name__ == '__main__':<CR>
