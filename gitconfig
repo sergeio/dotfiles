@@ -14,6 +14,7 @@
     dc = diff --cached
     del = branch -d
     di = diff
+    fixup = commit --amend -a --no-edit
     head = log -1
     # Show files ignored by git:
     ign = ls-files -o -i --exclude-standard
@@ -23,6 +24,7 @@
     ls = ls-files
     po = pull origin
     pr = remote prune origin
+    tidy = !git remote prune origin && git branch -r --merged master | grep -v 'master$' | grep origin | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | xargs git branch -d
     unadd = reset head
     rim = rebase -i master
     s = status -s

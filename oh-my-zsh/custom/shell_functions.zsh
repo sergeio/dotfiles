@@ -1,14 +1,25 @@
+sssh (){
+    ssh -t $* 'tmux attach || tmux new';
+}
+
 pull_request(){
     # If no remote specified, default to 'aweber'
     if (( $# == 0 )); then 1="aweber"; fi
     open http://github.colo.lair/$1/$(pwd | sed 's/.*\///')/pull/new/$(parse_git_branch)
 }
 
+testfileo(){
+    ulimit -n 1024
+    project=$(pwd | sed -e 's/.*\///' -e 's/-/_/g')
+    upper_project=$(echo $project | tr a-z A-Z)
+    find $project tests -type f -name '*.py' | watchfiles "source bin/activate; eval ${upper_project}_CONF=$(find . -name 'development.conf') bin/nosetests $@"
+}
+
 testfile(){
     ulimit -n 1024
     project=$(pwd | sed -e 's/.*\///' -e 's/-/_/g')
     upper_project=$(echo $project | tr a-z A-Z)
-    find $project tests -type f -name '*.py' | watchfiles "source bin/activate; eval ${upper_project}_CONF=configuration/development.conf bin/nosetests $@"
+    find $project tests -type f -name '*.py' | watchfiles "source bin/activate; eval ${upper_project}_CONF=../configuration/development.conf bin/nosetests ${@/tests\//}"
 }
 
 wiki(){
@@ -66,7 +77,7 @@ graph_aids(){
 }
 
 lookup(){
-    curl -s 'reputation/v1/reputations'$1 |
+    curl -s 'http://puppet-bridge.colo.lair:11003/v1/reputations'$1 |
     python -c 'import pprint, json; pprint.pprint(json.loads(raw_input())["content"])'
 }
 

@@ -1,10 +1,14 @@
 " Pathogen
-call pathogen#infect()
-call pathogen#helptags()
+silent! call pathogen#infect()
+silent! call pathogen#helptags()
 
 set number "linenumbers
 set noerrorbells visualbell t_vb=
-colors wombat256mod
+
+" default to slate, but use wombad256 if it's available
+silent! colors slate
+silent! colors wombat256mod
+
 syntax on
 set antialias
 set t_Co=256
@@ -62,14 +66,14 @@ vmap [[ o<esc>[[V''o
 nnoremap <silent> <Space><Space> :nohlsearch<Bar>:echo<CR>
 "
 " Easy normal-mode linen wrapping
-nnoremap <silent> <CR> i<CR><esc>
+nnoremap <silent> <CR> i<CR><esc>l
 "
 " pdb mapping
 nmap \b mxoimport pdb; pdb.set_trace()<esc>`x
 
 " pprint mapping
-nmap \p :s/\vprint (.*)/pprint\(\1\)<CR>mxOfrom pprint import pprint<esc>`x
-nmap \P :s/\vpprint\((.*)\)/print \1/<CR>kdd
+nmap \\p :s/\vprint (.*)/pprint\(\1\)<CR>mxOfrom pprint import pprint<esc>`x
+nmap \\P :s/\vpprint\((.*)\)/print \1/<CR>kdd
 
 " forgot sudo?
 cmap W!! %!sudo tee > /dev/null %
@@ -113,7 +117,6 @@ set scrolloff=5
 set sidescrolloff=5
 
 set undolevels=1000                 "1000 undos
-set updatecount=100                 "switch every 100 chars
 
 "Don't want backup files
 set nobackup
@@ -131,6 +134,9 @@ nnoremap ,so :w\|source %\|nohlsearch<cr>
 nnoremap ,' ""yls<c-r>={'"': "'", "'": '"'}[@"]<cr><esc>
 vnoremap ,' ""yls<c-r>={'"': "'", "'": '"'}[@"]<cr><esc>
 
+" Remove all trailing whitespace in file
+nmap ,ss :%s/ \+$//<CR>
+
 " When 3 vertial windows open, make current one slightly bigger
 nnoremap ,cc <c-w>h5<c-w><2<c-w>l5<c-w><<c-w>h
 " When 3 vertial windows open, make the left two slightly bigger
@@ -139,6 +145,8 @@ nnoremap ,ch <c-w>h5<c-w>><c-w>l10<c-w>>
 " Settings for VimClojure
 let vimclojure#HighlightBuiltins=1      " Highlight Clojure's builtins
 let vimclojure#ParenRainbow=1
+
+au BufRead,BufNewFile *.clj set filetype=clojure
 
 "Completion
 set complete=.,w,b,u,U,t,i,d
@@ -169,8 +177,10 @@ highlight DiffAdd ctermbg=green
 highlight DiffDelete ctermbg=red
 highlight DiffChange ctermbg=yellow
 
-set cc=80
-highlight ColorColumn ctermbg=235 guibg=#222222
+if exists("+colorcolumn")
+    set cc=80
+    highlight ColorColumn ctermbg=235 guibg=#222222
+endif
 
 " Fix clipboard for tmux on mac
 set clipboard=unnamed
