@@ -148,6 +148,9 @@ let vimclojure#ParenRainbow=1
 
 au BufRead,BufNewFile *.clj set filetype=clojure
 
+" Settings for vim-markdown
+let g:vim_markdown_folding_disabled=1
+
 "Completion
 set complete=.,w,b,u,U,t,i,d
 
@@ -192,5 +195,4 @@ if has("gui_running")
     " STOP BLINKING, YOU PIECE OF ----
     set guicursor=a:blinkon0
 endif
-
 imap IFF if __name__ == '__main__':<CR>
