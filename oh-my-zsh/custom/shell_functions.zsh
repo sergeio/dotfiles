@@ -112,6 +112,12 @@ show(){
         open $TMPDIR/${args// /_}.jpg) &)
 }
 
+rprompt() {
+    if [ -z "$IGNOREGIT" ]; then
+        echo "$(check_git_status) $(parse_git_branch)"
+    fi
+}
+
 check_git_status() {
     local ST
     ST=$(git status 2> /dev/null)
