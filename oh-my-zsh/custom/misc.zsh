@@ -1,3 +1,4 @@
+export EDITOR=`which vim`
 source ~/code/bk/bk.zsh
 source `brew --prefix`/etc/profile.d/z.sh
 
