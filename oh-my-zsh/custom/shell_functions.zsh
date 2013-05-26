@@ -1,7 +1,12 @@
+KNIFEPROD (){
+  knife "$@" -c ~/.chef_PROD/knife.rb
+}
 sssh (){
     ssh -t $* 'tmux attach || tmux new';
 }
-
+vssh () {
+    ssh -q -F ~/repos/infrastructure_services/.ssh_config $1 -t 'sudo su -'
+}
 pull_request(){
     # If no remote specified, default to 'aweber'
     if (( $# == 0 )); then 1="aweber"; fi
