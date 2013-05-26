@@ -4,8 +4,11 @@ alias search='grep -r -i --binary-files=without-match'
 # alias grep='grep --color=auto'
 
 # alias workoff='deactivate'
+alias j=z
 alias v='vagrant'
-alias vs='vagrant status'
+alias vs='vagrant status | grep -v -e "Current VM" -e "This environment" -e "above with" -e "VM, run" | sed "/^$/d" | sort'
+alias vss="vs | grep -v 'not created'"
+alias vsshh="ssh -q -F ./.ssh_config"
 alias vu='vagrant up'
 alias vd='vagrant destroy'
 alias updatedb='sudo /usr/libexec/locate.updatedb'
@@ -13,9 +16,10 @@ alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias gs=''
 
 alias g='git'
+alias gr="GIT_EDITOR=\"vim -c \\\"1,'}-1s/\n/\rx git diff origin\/master | pep8 --diff --count --exclude \\\"__init__.py\\\"\r/g | nohlsearch \\\"\" git rebase -i"
 
 alias mfiles='git diff master --name-only --diff-filter=ACMR'
-alias dlint='(mfiles | grep -v "^tests/" | grep ".py$" | xargs bin/pylint); (mfiles | grep -e "^tests/" -e ".py$" | xargs bin/pylint | grep 'Unused')'
+alias dlint='(mfiles | grep -v "^tests/" | grep ".py$" | xargs bin/pylint); (mfiles | grep "^tests/" | grep ".py$" | xargs bin/pylint | grep 'Unused')'
 alias dpep8='mfiles | grep ".py$" | xargs bin/pep8 -r'
 alias dint='make integration-coverage 2>&1 | egrep `mfiles | sed "s/\//\./g" | sed "s/\.py$//g" | xargs | sed "s/ /|/g"` | grep -v "100%"'
 alias dcov='make coverage 2>&1 | egrep `mfiles | sed "s/\//\./g" | sed "s/\.py$//g" | xargs | sed "s/ /|/g"` | grep -v "100%"'
