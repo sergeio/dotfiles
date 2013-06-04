@@ -1,6 +1,6 @@
 [user]
     name = Sergei Orlov
-    email = sergeio@aweber.com
+    email = sorlov+github@gmail.com
 [diff]
 [color]
     ui = auto
@@ -18,9 +18,10 @@
     head = log -1
     # Show files ignored by git:
     ign = ls-files -o -i --exclude-standard
-    lg = log -p
+    last = !git log -4 --format="%h.%cr.%s" | cat
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+    lg = log -p
     ls = ls-files
     po = pull origin
     pr = remote prune origin

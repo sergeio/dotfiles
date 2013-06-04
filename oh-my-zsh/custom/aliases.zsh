@@ -1,9 +1,11 @@
 # alias ls='ls -G'
 # alias getw='wget -r -np'
+
 alias search='grep -r -i --binary-files=without-match'
 # alias grep='grep --color=auto'
 
 # alias workoff='deactivate'
+alias tmux='tmux -2'
 alias j=z
 alias v='vagrant'
 alias vs='vagrant status | grep -v -e "Current VM" -e "This environment" -e "above with" -e "VM, run" | sed "/^$/d" | sort'

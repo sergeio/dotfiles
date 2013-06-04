@@ -151,6 +151,9 @@ au BufRead,BufNewFile *.clj set filetype=clojure
 " Settings for vim-markdown
 let g:vim_markdown_folding_disabled=1
 
+" wrap markdown bullet points correctly
+map ,= :norm ==gqj<CR>
+
 "Completion
 set complete=.,w,b,u,U,t,i,d
 
