@@ -75,6 +75,11 @@ nmap \b mxoimport pdb; pdb.set_trace()<esc>`x
 nmap \\p :s/\vprint (.*)/pprint\(\1\)<CR>mxOfrom pprint import pprint<esc>`x
 nmap \\P :s/\vpprint\((.*)\)/print \1/<CR>kdd
 
+" turn line into markdown link
+" nmap ,k 0y$i[jkA](jkpA)jk
+nmap ,K 0y$i[jkA](jkpA)jkI  * <esc>lci[
+nmap ,k O<esc>:.!link_extractor<CR>
+
 " forgot sudo?
 cmap W!! %!sudo tee > /dev/null %
 
@@ -128,8 +133,9 @@ map ,t :CommandT<CR>
 map ,b :CommandTBuffer<CR>
 nmap ,l :set list!<CR>
 nnoremap ,w :w\|make unit-test<cr>
-nnoremap ,ev :80vs $MYVIMRC<cr>
+nnoremap ,ev :65vs $MYVIMRC<cr>
 nnoremap ,so :w\|source %\|nohlsearch<cr>
+nnoremap ,S :source ~/.vimrc<CR>
 
 nnoremap ,' ""yls<c-r>={'"': "'", "'": '"'}[@"]<cr><esc>
 vnoremap ,' ""yls<c-r>={'"': "'", "'": '"'}[@"]<cr><esc>
@@ -152,7 +158,12 @@ au BufRead,BufNewFile *.clj set filetype=clojure
 let g:vim_markdown_folding_disabled=1
 
 " wrap markdown bullet points correctly
-map ,= :norm ==gqj<CR>
+nmap ,= :norm ==gqj<CR>
+
+nmap ,+ vip >gv:norm ,=<CR>>>
+
+nmap ,d o<CR>                                  ...........<CR><esc>
+
 
 "Completion
 set complete=.,w,b,u,U,t,i,d
@@ -198,4 +209,27 @@ if has("gui_running")
     " STOP BLINKING, YOU PIECE OF ----
     set guicursor=a:blinkon0
 endif
-imap IFF if __name__ == '__main__':<CR>
+
+imap IFF if __name__ == '__main__':<CR>main()<ESC>kOdef main():<CR>
+
+map ,q <esc>:python indent_and_wrap_paragraph()<CR>
+
+python << EOF
+def indent_and_wrap_paragraph():
+    import vim
+    buffer = vim.current.buffer
+    vim.command('normal vipJ')
+    (row, _) = vim.current.window.cursor
+
+    print row
+
+    if row < len(buffer) and buffer[row]:
+        # For one-line "paragraphs", append a blank line to undo the `vipJ`
+        buffer[row:row] = ['']
+
+    while row <= len(buffer) and buffer[row - 1]:
+        buffer[row - 1] = '    ' + buffer[row - 1].strip()
+        vim.current.window.cursor = row, 0
+        vim.command('normal gqlgqj')
+        row += 1
+EOF
