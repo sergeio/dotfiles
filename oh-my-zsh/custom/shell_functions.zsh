@@ -111,10 +111,11 @@ get_one_most_recently_notified_list_id_for_account(){
 show(){
     # download and open image that matches args
     args=$*
+    TMPDIR=/tmp/pictures
     ((curl -q ${args// /%20}.jpg.to 2>/dev/null |
     sed -e 's/<img .*src="//' -e 's/" \/>//' |
     xargs wget -q -O $TMPDIR/${args// /_}.jpg &&
-        open $TMPDIR/${args// /_}.jpg) &)
+        ristretto $TMPDIR/${args// /_}.jpg) &)
 }
 
 rprompt() {
