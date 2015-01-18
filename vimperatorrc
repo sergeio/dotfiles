@@ -1,0 +1,19 @@
+set gui=none
+set gui=tabs
+
+map <c-k> <esc>
+imap <c-j> <esc>
+
+imap <C-n> <esc>:tabnext<cr>
+imap <C-p> <esc>:tabprev<cr>
+imap <C-o> <esc>:back<cr>
+imap <C-i> <esc>:forward<cr>
+nmap <C-f> /
+
+cmap <C-n> <esc>:tabnext<cr>
+cmap <C-p> <esc>:tabprev<cr>
+cmap <C-f> <right>
+cmap <C-b> <left>
+
+nmap <C-.> :set gui=all<cr>
+nmap <C->> :set gui=none<cr>:set gui=tabs<cr>

@@ -129,8 +129,8 @@ set nowritebackup
 set noswapfile
 
 map ,p :set paste!<CR>
-map ,t :CommandT<CR>
-map ,b :CommandTBuffer<CR>
+map ,t :CtrlP<CR>
+map ,b :CtrlPBuffer<CR>
 nmap ,l :set list!<CR>
 nnoremap ,w :w\|make unit-test<cr>
 nnoremap ,ev :65vs $MYVIMRC<cr>

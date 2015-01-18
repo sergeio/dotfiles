@@ -84,6 +84,7 @@ def install_oh_my_zsh
       system %Q{git clone https://github.com/robbyrussell/oh-my-zsh.git "$HOME/.oh-my-zsh"}
     when 'q'
       exit
+    system %Q{ln -s "$PWD/oh-my-zsh/custom" "$HOME/.oh-my-zsh/custom"}
     else
       puts "skipping oh-my-zsh, you will need to change ~/.zshrc"
     end
