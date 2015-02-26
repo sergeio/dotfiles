@@ -7,8 +7,8 @@ task :install do
   switch_to_zsh
   replace_all = false
   files = Dir['*'] - %w[Rakefile README.rdoc LICENSE oh-my-zsh]
-  files << "oh-my-zsh/custom/plugins/rbates"
-  files << "oh-my-zsh/custom/rbates.zsh-theme"
+  # files << "oh-my-zsh/custom/plugins/rbates"
+  # files << "oh-my-zsh/custom/rbates.zsh-theme"
   files.each do |file|
     system %Q{mkdir -p "$HOME/.#{File.dirname(file)}"} if file =~ /\//
     if File.exist?(File.join(ENV['HOME'], ".#{file.sub(/\.erb$/, '')}"))
@@ -82,9 +82,12 @@ def install_oh_my_zsh
     when 'y'
       puts "installing oh-my-zsh"
       system %Q{git clone https://github.com/robbyrussell/oh-my-zsh.git "$HOME/.oh-my-zsh"}
+      puts "removing .oh-my-zsh/custom"
+      system %Q{rm -rf "$HOME/.oh-my-zsh/custom"}
+      puts "linking dotfiles/oh-my-zsh/custom"
+      system %Q{ln -s "$HOME/dotfiles/oh-my-zsh/custom" "$HOME/.oh-my-zsh/custom"}
     when 'q'
       exit
-    system %Q{ln -s "$PWD/oh-my-zsh/custom" "$HOME/.oh-my-zsh/custom"}
     else
       puts "skipping oh-my-zsh, you will need to change ~/.zshrc"
     end
