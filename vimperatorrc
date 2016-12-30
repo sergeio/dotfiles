@@ -16,4 +16,4 @@ cmap <C-f> <right>
 cmap <C-b> <left>
 
 nmap <C-.> :set gui=all<cr>
-nmap <C->> :set gui=none<cr>:set gui=tabs<cr>
+nmap <C->> :set gui=none gui=tabs<cr>

@@ -43,6 +43,8 @@ set wildmenu
 " Don't suggest pyc files
 set wildignore+=*.pyc
 
+"Completion
+set complete=.,w,b,u,U,t
 "when tab is closed, remove the buffer:
 set hidden
 
@@ -87,8 +89,10 @@ cmap W!! %!sudo tee > /dev/null %
 cnoremap <c-a> <home>
 cnoremap <c-e> <end>
 
-map _ :s/\v^(\s*)# /\1/<cr>:nohlsearch<cr>
-map - :s/\v^(\s*)(.+)/\1# \2/<cr>:nohlsearch<cr>
+" map _ :s/\\v^(\\s*)# /\\1/<cr>:nohlsearch<cr>
+" map - :s/\\v^(\\s*)(.+)/\\1# \\2/<cr>:nohlsearch<cr>
+map - gc
+map _ gc
 
 imap jk <esc>
 imap JK <esc>
@@ -110,8 +114,8 @@ inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 inoremap <s-tab> <c-n>
 
 " Use sane regexes.
-nnoremap / /\v
-vnoremap / /\v
+" nnoremap / /\\v
+" vnoremap / /\\v
 
 " Create newlines and stay in Normal Mode
 nnoremap <silent> <Space>j mxo<Esc>`x
@@ -128,17 +132,28 @@ set nobackup
 set nowritebackup
 set noswapfile
 
+if executable("ag")
+    let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g ""'
+else
+    let g:ctrlp_user_command = {
+        \ 'types': {
+          \ 1: ['.git', 'cd %s && git ls-files . -co --exclude-standard'],
+          \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+          \ },
+        \ 'fallback': 'find %s -type f'
+    \ }
+endif
+
 map ,p :set paste!<CR>
 map ,t :CtrlP<CR>
 map ,b :CtrlPBuffer<CR>
+map ,j :CtrlPLine<CR>
+map ,g :CtrlPTag<CR>
 nmap ,l :set list!<CR>
 nnoremap ,w :w\|make unit-test<cr>
 nnoremap ,ev :65vs $MYVIMRC<cr>
 nnoremap ,so :w\|source %\|nohlsearch<cr>
-nnoremap ,S :source ~/.vimrc<CR>
-
-nnoremap ,' ""yls<c-r>={'"': "'", "'": '"'}[@"]<cr><esc>
-vnoremap ,' ""yls<c-r>={'"': "'", "'": '"'}[@"]<cr><esc>
+nnoremap ,S :set spell!<CR>
 
 " Remove all trailing whitespace in file
 nmap ,ss :%s/ \+$//<CR>
@@ -164,9 +179,7 @@ nmap ,+ vip >gv:norm ,=<CR>>>
 
 nmap ,d o<CR>                                  ...........<CR><esc>
 
-
-"Completion
-set complete=.,w,b,u,U,t,i,d
+nmap ,v :s/TODO/✓ DONE/<CR>:nohlsearch<Bar>:echo<CR>
 
 filetype plugin indent on
 set nosmartindent
@@ -206,13 +219,13 @@ set clipboard=unnamed
 if has("gui_running")
     set guifont=Droid\ Sans\ Mono:h14
     set guioptions=egmt
-    " STOP BLINKING, YOU PIECE OF ----
-    set guicursor=a:blinkon0
 endif
 
 imap IFF if __name__ == '__main__':<CR>main()<ESC>kOdef main():<CR>
 
 map ,q <esc>:python indent_and_wrap_paragraph()<CR>
+map ,. <esc>:python indent_markdown_list_item(1)<CR>
+map ,, <esc>:python indent_markdown_list_item(-1)<CR>
 
 python << EOF
 def indent_and_wrap_paragraph():
@@ -232,4 +245,25 @@ def indent_and_wrap_paragraph():
         vim.current.window.cursor = row, 0
         vim.command('normal gqlgqj')
         row += 1
+EOF
+
+python << EOF
+def indent_markdown_list_item(direction=1):
+    import vim
+    buffer = vim.current.buffer
+    (row, _) = vim.current.window.cursor
+    row -= 1
+    if not buffer[row]:
+        return
+
+    bullets = '*-+'
+    leading_spaces = 0
+    while buffer[row][leading_spaces] == ' ':
+        leading_spaces += 1
+    if buffer[row][leading_spaces] not in bullets:
+        return
+    level = (leading_spaces / 2) - 1
+    new_bullet = bullets[(level + direction) % len(bullets)]
+    spaces = ' ' * (leading_spaces + 2 * direction)
+    buffer[row] = spaces + new_bullet + buffer[row][leading_spaces + 1:]
 EOF

@@ -1,3 +1,76 @@
+f () {
+    find . -iname $(sed 's/\(.\)/\1*/g' <<< $1) \
+        -not \( -path './genfiles/*' -prune \) \
+        -not \( -path './.git/*' -prune \)
+}
+
+difiles () {
+    git status --porcelain | awk '{print $2}'
+}
+
+alarm () {
+    osascript -e "set Volume 2.4"
+    sleep_until $1
+    while sleep 4; do
+        say wake
+    done
+}
+
+tloop () {
+    difiles | watchfiles "clear; date; ./tools/runtests.py $1"
+}
+
+todo_2 () {
+    # Usage: todo <name> <optional flag string eg. STOPSHIP>`
+    # All of a user's TODOs, ordered by date
+    _groupby_grep_file_output () {
+        # Groups filename:1\nfilename:2 into filename:1,2
+        awk -F: '{if ($1 in arr)
+                      arr[$1] = (arr[$1] "," $2)
+                  else
+                      arr[$1] = $2}
+                  END {
+                      for (key in arr) printf("%s:%s\n", key, arr[key])
+                 }'
+    }
+
+    _nums_to_blame_opts () {
+        # Turn "1,2,3" into "-L 1,1 -L 2,2 -L 3,3"
+        opts=""
+        for num in $(sed 's/,/ /g' <<< $1); do
+            opts="$opts -L $num,$num"
+        done
+        echo "$opts"
+    }
+
+    _grep_to_blame () {
+        while read LINE; do
+            filename=$(cut -d: -f1 <<< $LINE)
+            line_nums=$(cut -d: -f2 <<< $LINE)
+            blame_line_opts=$(_nums_to_blame_opts $line_nums)
+            eval "git blame --show-name --show-number $blame_line_opts $filename"
+        done
+    }
+
+    _transform_blame_line () {
+        # Replace hash with date, remove committer name
+        while read blame_line; do
+            hsh=$(cut -d' ' -f1 <<< $blame_line)
+            rest=$(cut -d' ' -f2- <<< $blame_line)
+            # Remove '(Committer M. Name 2020-01-01 99:99 -7000 123)    '
+            rest=$(sed 's/([^)]*) *//' <<< $rest)
+            date=$(git show -s --format='%ad' --date=short $hsh)
+            echo "$date $rest"
+        done
+    }
+
+    git grep -n "${2:-TODO}($1)" \
+        | _groupby_grep_file_output \
+        | _grep_to_blame \
+        | _transform_blame_line \
+        | sort
+}
+
 KNIFEPROD (){
   knife "$@" -c ~/.chef_PROD/knife.rb
 }
@@ -118,20 +191,38 @@ show(){
         ristretto $TMPDIR/${args// /_}.jpg) &)
 }
 
+rprompt_on() {
+    export IGNOREGIT=''
+}
+rprompt_off() {
+    export IGNOREGIT=y
+}
+on () { rprompt_on }
+off () { rprompt_off }
+
 rprompt() {
     if [ -z "$IGNOREGIT" ]; then
         echo "$(check_git_status) $(parse_git_branch)"
     fi
 }
 
+# check_git_status() {
+# This is nice, but no faster than my original function
+# # http://stackoverflow.com/questions/2657935/checking-for-a-dirty-index-or-untracked-files-with-git
+    # local EVERYTHING_COMMITTED
+    # local NO_UNTRACKED
+    # EVERYTHING_COMMITTED=$(git diff-index --quiet HEAD)
+    # NO_UNTRACKED=$(test -z "$(git ls-files --others --exclude-standard)")
+    # if $EVERYTHING_COMMITTED && $NO_UNTRACKED; then
+        # echo "%{$fg[red]%}+%{$reset_color%}"
+    # fi
+# }
+
 check_git_status() {
-    local ST
-    ST=$(git status 2> /dev/null)
-    if [[ $? != 0 ]] then
+    if [[ ! -d .git/ ]]; then
         return
     fi
-    echo $ST | grep '^nothing to commit' 1> /dev/null
-    if [[ $? == 1 ]] then
+    if [[ ! -z $(git status -s) ]]; then
         echo "%{$fg[red]%}+%{$reset_color%}"
     fi
 }
@@ -142,7 +233,7 @@ parse_git_branch() {
 }
 
 get_exit_code_color() {
-    if [[ $? != 0 ]] then
+    if [[ $? != 0 ]]; then
         COLOR=$PROMPT_ERROR
     else
         COLOR=$PROMPT_COLOR
@@ -163,6 +254,17 @@ function percent_charge () {
     percent=`echo "$current_charge/$total_charge * 100" | bc -l | cut -d '.' -f 1`
     echo $percent%
 }
+
+function eg(){
+    if [[ `uname` == 'Linux' ]]; then
+        MAN_KEEP_FORMATTING=1 man "$@" 2>/dev/null \
+            | sed --quiet --expression='/^E\(\x08.\)X\(\x08.\)\?A\(\x08.\)\?M\(\x08.\)\?P\(\x08.\)\?L\(\x08.\)\?E/{:a;p;n;/^[^ ]/q;ba}' \
+            | ${MANPAGER:-${PAGER:-pager -s}}
+    else
+        man $1 | grep '^EXAMPLES' -A 1000 #| grep '^[A-Z]' -m 2 -B 1000 -A 0 | sed '$d' | $PAGER
+    fi
+}
+
 
 
 copy_paste_tmux() {
