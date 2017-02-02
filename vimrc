@@ -133,13 +133,13 @@ set nowritebackup
 set noswapfile
 
 if executable("ag")
-    let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g ""'
+    let g:ctrlp_user_command = "ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g '' | python -c 'import sys; print \"\".join(sorted(sys.stdin, key=lambda l: len(l)))'"
 else
     let g:ctrlp_user_command = {
         \ 'types': {
           \ 1: ['.git', 'cd %s && git ls-files . -co --exclude-standard'],
           \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-          \ },
+        \ },
         \ 'fallback': 'find %s -type f'
     \ }
 endif

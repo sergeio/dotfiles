@@ -1,7 +1,8 @@
 f () {
     find . -iname $(sed 's/\(.\)/\1*/g' <<< $1) \
         -not \( -path './genfiles/*' -prune \) \
-        -not \( -path './.git/*' -prune \)
+        -not \( -path './.git/*' -prune \) \
+        -not \( -name '*.pyc' \)
 }
 
 difiles () {
