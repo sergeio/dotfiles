@@ -1,0 +1,1 @@
+/Users/sergeiorlov/khan/devtools/khan-dotfiles/.vim/ftplugin/css.vim
