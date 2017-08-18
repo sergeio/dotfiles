@@ -34,6 +34,12 @@ if !has("gui_running")
     set t_fs=
 endif
 
+imap jk <esc>
+imap JK <esc>
+imap Jk <esc>
+imap <c-a> <c-o>I
+imap <c-e> <c-o>A
+
 "mouse support
 "set mouse=a
 
@@ -93,12 +99,6 @@ cnoremap <c-e> <end>
 " map - :s/\\v^(\\s*)(.+)/\\1# \\2/<cr>:nohlsearch<cr>
 map - gc
 map _ gc
-
-imap jk <esc>
-imap JK <esc>
-imap Jk <esc>
-imap <c-a> <c-o>I
-imap <c-e> <c-o>A
 
 " Remap the tab key to do autocompletion or indentation depending on the
 " context (from http://www.vim.org/tips/tip.php?tip_id=102)
@@ -168,6 +168,7 @@ let vimclojure#HighlightBuiltins=1      " Highlight Clojure's builtins
 let vimclojure#ParenRainbow=1
 
 au BufRead,BufNewFile *.clj set filetype=clojure
+au BufRead,BufNewFile *.py set filetype=python
 
 " Settings for vim-markdown
 let g:vim_markdown_folding_disabled=1
@@ -187,6 +188,11 @@ set nosmartindent
 " Use the same symbols as TextMate for tabstops and EOLs
 set list
 set listchars=tab:▸\ ,trail:‽ ",eol:¬
+
+" Ale is a linting plugin
+" let g:ale_linters = {'python': 'all'}
+" let g:ale_echo_msg_format = '[%linter%] %s'
+" highlight clear SignColumn
 
 "Invisible character colors
 highlight NonText guifg=#555555 ctermfg=238

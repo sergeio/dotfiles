@@ -171,10 +171,10 @@ accounts_notified_16_days_ago_but_not_yesterday(){
     sed 's/^< //'
 }
 
-convert(){
-    curl -s 'http://puppet-bridge.colo.lair:11003/v1/reputations?filter='$1':'$3'&limit=1' |
-    python -c "import json; print json.loads(raw_input())['content'][0][\"$2\"]"
-}
+# convert(){
+#     curl -s 'http://puppet-bridge.colo.lair:11003/v1/reputations?filter='$1':'$3'&limit=1' |
+#     python -c "import json; print json.loads(raw_input())['content'][0][\\"$2\\"]"
+# }
 
 get_one_most_recently_notified_list_id_for_account(){
     curl -s 'reputation/v1/notifications?sort=date:desc&limit=1&filter=notified:notified&filter=account_id:'`aid_from_login $1` |

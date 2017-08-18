@@ -16,6 +16,7 @@ alias vu='vagrant up'
 alias vd='vagrant destroy'
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias t='./tools/runtests.py'
+alias tsat='./tools/runtests.py api.internal.test.sat_test sat'
 
 alias gs=''
 
