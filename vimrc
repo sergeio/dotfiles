@@ -1,6 +1,14 @@
+call plug#begin('~/.vim/plugged')
+Plug 'nvie/vim-flake8', { 'for': 'python' }
+Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+Plug 'kien/ctrlp.vim'
+Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
+Plug 'mxw/vim-jsx', { 'for': 'jsx' }
+call plug#end()
+
 " Pathogen
-silent! call pathogen#infect()
-silent! call pathogen#helptags()
+" silent! call pathogen#infect()
+" silent! call pathogen#helptags()
 
 set number "linenumbers
 set noerrorbells visualbell t_vb=
@@ -219,7 +227,8 @@ if exists("+colorcolumn")
 endif
 
 " Fix clipboard for tmux on mac
-set clipboard=unnamed
+"set clipboard=unnamed "mac
+set clipboard=unnamedplus "'nix
 
 "Macvim remove toolbar
 if has("gui_running")
