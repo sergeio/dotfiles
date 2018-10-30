@@ -4,6 +4,12 @@ alias agt="ag --ignore=third_party --ignore=tags --ignore='*_test.*'"
 alias ag='ag --ignore=third_party --ignore=tags'
 alias agp="ag --ignore=third_party --ignore=tags --ignore=third_party --ignore='*.(js)(jsx)(html)(less)(css)'"
 
+# alias ydl="youtube-dl -f 'bestvideo[height<=720][fps<=30]+bestaudio/best'"
+alias ydl="youtube-dl -f 'best[height<=720][fps<=?30]'"
+alias ydl480="youtube-dl -f 'bestvideo[height<=480][fps<=?30]+bestaudio/best'"
+alias tdl="youtube-dl -f 720p"
+alias tdl480="youtube-dl -f 480p"
+
 # alias workoff='deactivate'
 alias tmux='tmux -2'
 alias j=z

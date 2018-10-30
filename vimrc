@@ -1,9 +1,10 @@
 call plug#begin('~/.vim/plugged')
 Plug 'nvie/vim-flake8', { 'for': 'python' }
+Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'kien/ctrlp.vim'
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
-Plug 'mxw/vim-jsx', { 'for': 'jsx' }
+Plug 'mxw/vim-jsx', { 'for': ['jsx', 'js'] }
 call plug#end()
 
 " Pathogen
@@ -28,6 +29,9 @@ set shiftwidth=4
 set nowrap
 set title
 set nopaste
+
+autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2
+autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " searching:
 set incsearch
