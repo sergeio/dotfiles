@@ -5,6 +5,7 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'kien/ctrlp.vim'
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
 Plug 'mxw/vim-jsx', { 'for': ['jsx', 'js'] }
+Plug 'jiangmiao/auto-pairs'
 call plug#end()
 
 " Pathogen
