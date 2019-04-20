@@ -17,6 +17,11 @@ alarm () {
     done
 }
 
+pycd () {
+    # cd to a Python package's source directory
+    cd `python -c "import os.path, $1; print(os.path.dirname($1.__file__))"`;
+}
+
 tloop () {
     difiles | watchfiles "clear; date; ./tools/runtests.py $1"
 }

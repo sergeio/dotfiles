@@ -5,7 +5,7 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'kien/ctrlp.vim'
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
 Plug 'mxw/vim-jsx', { 'for': ['jsx', 'js'] }
-Plug 'jiangmiao/auto-pairs'
+" Plug 'jiangmiao/auto-pairs'
 call plug#end()
 
 " Pathogen
@@ -32,6 +32,7 @@ set title
 set nopaste
 
 autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2
+autocmd FileType scheme setlocal tabstop=2 softtabstop=2 shiftwidth=2
 autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " searching:
@@ -55,6 +56,14 @@ imap <c-e> <c-o>A
 
 "mouse support
 "set mouse=a
+
+"Disable accidentally scrolling on the touchpad when typing
+"(tmux maps scrolling to arrow keys when mouse=off,
+"and I can't find how to disable that)
+inoremap <up> <Nop>
+inoremap <down> <Nop>
+noremap <up> <Nop>
+noremap <down> <Nop>
 
 "tab completion of filenames fix (from allanc)
 set wildmode=longest,list,full
@@ -91,6 +100,9 @@ nnoremap <silent> <CR> i<CR><esc>l
 "
 " pdb mapping
 nmap \b mxoimport pdb; pdb.set_trace()<esc>`x
+
+" Convert an a/b fraction into \frac{a}/{b}
+nmap ,f i\frac{jklxf/Pf/s{jklxhEa}jkww
 
 " pprint mapping
 nmap \\p :s/\vprint (.*)/pprint\(\1\)<CR>mxOfrom pprint import pprint<esc>`x
@@ -145,17 +157,21 @@ set nobackup
 set nowritebackup
 set noswapfile
 
-if executable("ag")
-    let g:ctrlp_user_command = "ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g '' | python -c 'import sys; print \"\".join(sorted(sys.stdin, key=lambda l: len(l)))'"
-else
-    let g:ctrlp_user_command = {
-        \ 'types': {
-          \ 1: ['.git', 'cd %s && git ls-files . -co --exclude-standard'],
-          \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-        \ },
-        \ 'fallback': 'find %s -type f'
-    \ }
-endif
+" if executable("ag")
+"     let g:ctrlp_user_command = "ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g '' | python -c 'import sys; print \\"\\".join(sorted(sys.stdin, key=lambda l: len(l)))'"
+"
+" else
+"     let g:ctrlp_user_command = {
+"         \\ 'types': {
+"           \\ 1: ['.git', 'cd %s && git ls-files . -co --exclude-standard'],
+"           \\ 2: ['.hg', 'hg --cwd %s locate -I .'],
+"         \\ },
+"         \\ 'fallback': 'find %s -type f'
+"     \\ }
+" endif
+"
+
+let g:ctrlp_user_command = "ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g '' | awk '{ print length, $0 }' | sort -n -s | cut -d' ' -f2-"
 
 map ,p :set paste!<CR>
 map ,t :CtrlP<CR>
@@ -276,7 +292,7 @@ def indent_markdown_list_item(direction=1):
     if not buffer[row]:
         return
 
-    bullets = '*-+'
+    bullets = '-+*'
     leading_spaces = 0
     while buffer[row][leading_spaces] == ' ':
         leading_spaces += 1

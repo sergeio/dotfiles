@@ -9,6 +9,8 @@ alias ydl="youtube-dl -f 'best[height<=720][fps<=?30]'"
 alias ydl480="youtube-dl -f 'bestvideo[height<=480][fps<=?30]+bestaudio/best'"
 alias tdl="youtube-dl -f 720p"
 alias tdl480="youtube-dl -f 480p"
+alias yy='url=$(pbpaste); echo $url; until ydl $url; do sleep 1; done'
+alias y='cd ~/Videos; url=$(pbpaste); echo $url; until ydl $url; do sleep 1; done'
 
 # alias workoff='deactivate'
 alias tmux='tmux -2'
@@ -20,7 +22,7 @@ alias vss="vs | grep -v 'not created'"
 alias vsshh="ssh -q -F ./.ssh_config"
 alias vu='vagrant up'
 alias vd='vagrant destroy'
-alias updatedb='sudo /usr/libexec/locate.updatedb'
+# alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias t='./tools/runtests.py'
 alias tsat='./tools/runtests.py api.internal.test.sat_test sat'
 
