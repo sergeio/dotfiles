@@ -37,3 +37,19 @@ source $ZSH/oh-my-zsh.sh
 # export PATH=~/bin:/opt/local/bin:/usr/local/bin:/Users/sergeio/bin:/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/opt/local/bin:/Users/sergeio/bin:/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin
 # export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:~/bin:/opt/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
 export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin:~/bin:/opt/local/bin:$PATH:/bin:/sbin
+
+
+if [[ ! $TERM =~ screen ]]; then
+    exec tmux
+fi
+
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+    eval `ssh-agent -s`
+    ssh-add ~/.ssh/*_rsa
+    clear
+fi
+
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \\. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+#

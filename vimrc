@@ -249,7 +249,7 @@ endif
 
 " Fix clipboard for tmux on mac
 "set clipboard=unnamed "mac
-set clipboard=unnamedplus "'nix
+set clipboard^=unnamed,unnamedplus "'nix
 
 "Macvim remove toolbar
 if has("gui_running")
