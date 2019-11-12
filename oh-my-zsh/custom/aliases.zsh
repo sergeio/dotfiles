@@ -1,7 +1,7 @@
 alias search='grep -r -i --binary-files=without-match'
 alias agg='ag --ignore tags'
 alias agt="ag --ignore=third_party --ignore=tags --ignore='*_test.*'"
-alias ag='ag --ignore=third_party --ignore=tags'
+alias ag='ag --ignore=third_party --ignore=tags --ignore=dist --ignore="*min.js" --ignore=junit.xml --ignore="*.min.css"'
 alias agp="ag --ignore=third_party --ignore=tags --ignore=third_party --ignore='*.(js)(jsx)(html)(less)(css)'"
 
 # alias ydl="youtube-dl -f 'bestvideo[height<=720][fps<=30]+bestaudio/best'"
@@ -22,6 +22,7 @@ alias vss="vs | grep -v 'not created'"
 alias vsshh="ssh -q -F ./.ssh_config"
 alias vu='vagrant up'
 alias vd='vagrant destroy'
+alias dc='docker-compose'
 # alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias t='./tools/runtests.py'
 alias tsat='./tools/runtests.py api.internal.test.sat_test sat'
@@ -30,6 +31,7 @@ alias gs=''
 
 alias g='git'
 alias gr="GIT_EDITOR=\"vim -c \\\"1,'}-1s/\n/\rx git diff origin\/master | pep8 --diff --count --exclude \\\"__init__.py\\\"\r/g | nohlsearch \\\"\" git rebase -i"
+alias gbrs="git branch | sed 's/^[ *]//' | grep -v -E '(master|develop)' | xargs git --no-pager show --format='%at %h' --no-patch | sort -n | cut -d' ' -f 2 | xargs git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar' --no-patch"
 
 alias mfiles='git diff master --name-only --diff-filter=ACMR'
 alias dlint='(mfiles | grep -v "^tests/" | grep ".py$" | xargs bin/pylint); (mfiles | grep "^tests/" | grep ".py$" | xargs bin/pylint | grep 'Unused')'

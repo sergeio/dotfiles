@@ -5,12 +5,10 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'kien/ctrlp.vim'
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
 Plug 'mxw/vim-jsx', { 'for': ['jsx', 'js'] }
+Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
+Plug 'peitalin/vim-jsx-typescript', { 'for': 'typescript' }
 " Plug 'jiangmiao/auto-pairs'
 call plug#end()
-
-" Pathogen
-" silent! call pathogen#infect()
-" silent! call pathogen#helptags()
 
 set number "linenumbers
 set noerrorbells visualbell t_vb=
@@ -33,7 +31,7 @@ set nopaste
 
 autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2
 autocmd FileType scheme setlocal tabstop=2 softtabstop=2 shiftwidth=2
-autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
+" autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " searching:
 set incsearch
@@ -172,6 +170,7 @@ set noswapfile
 "
 
 let g:ctrlp_user_command = "ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g '' | awk '{ print length, $0 }' | sort -n -s | cut -d' ' -f2-"
+let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:50'
 
 map ,p :set paste!<CR>
 map ,t :CtrlP<CR>
@@ -183,6 +182,8 @@ nnoremap ,w :w\|make unit-test<cr>
 nnoremap ,ev :65vs $MYVIMRC<cr>
 nnoremap ,so :w\|source %\|nohlsearch<cr>
 nnoremap ,S :set spell!<CR>
+
+set tags=tags,./tags,~/fun/tags
 
 " Remove all trailing whitespace in file
 nmap ,ss :%s/ \+$//<CR>
@@ -263,43 +264,53 @@ map ,q <esc>:python indent_and_wrap_paragraph()<CR>
 map ,. <esc>:python indent_markdown_list_item(1)<CR>
 map ,, <esc>:python indent_markdown_list_item(-1)<CR>
 
-python << EOF
-def indent_and_wrap_paragraph():
-    import vim
-    buffer = vim.current.buffer
-    vim.command('normal vipJ')
-    (row, _) = vim.current.window.cursor
+" Can use this Input function to pause macros by going into insert mode,
+" ^r=Input()
+" Useful for eg showing you a before/after, ensuring correctness
+function! Input()
+    call inputsave()
+    let text = input('prompt> ')
+    call inputrestore()
+    return text
+endfunction
 
-    print row
-
-    if row < len(buffer) and buffer[row]:
-        # For one-line "paragraphs", append a blank line to undo the `vipJ`
-        buffer[row:row] = ['']
-
-    while row <= len(buffer) and buffer[row - 1]:
-        buffer[row - 1] = '    ' + buffer[row - 1].strip()
-        vim.current.window.cursor = row, 0
-        vim.command('normal gqlgqj')
-        row += 1
-EOF
-
-python << EOF
-def indent_markdown_list_item(direction=1):
-    import vim
-    buffer = vim.current.buffer
-    (row, _) = vim.current.window.cursor
-    row -= 1
-    if not buffer[row]:
-        return
-
-    bullets = '-+*'
-    leading_spaces = 0
-    while buffer[row][leading_spaces] == ' ':
-        leading_spaces += 1
-    if buffer[row][leading_spaces] not in bullets:
-        return
-    level = (leading_spaces / 2) - 1
-    new_bullet = bullets[(level + direction) % len(bullets)]
-    spaces = ' ' * (leading_spaces + 2 * direction)
-    buffer[row] = spaces + new_bullet + buffer[row][leading_spaces + 1:]
-EOF
+" python << EOF
+" def indent_and_wrap_paragraph():
+"     import vim
+"     buffer = vim.current.buffer
+"     vim.command('normal vipJ')
+"     (row, _) = vim.current.window.cursor
+" 
+"     print row
+" 
+"     if row < len(buffer) and buffer[row]:
+"         # For one-line "paragraphs", append a blank line to undo the `vipJ`
+"         buffer[row:row] = ['']
+" 
+"     while row <= len(buffer) and buffer[row - 1]:
+"         buffer[row - 1] = '    ' + buffer[row - 1].strip()
+"         vim.current.window.cursor = row, 0
+"         vim.command('normal gqlgqj')
+"         row += 1
+" EOF
+" 
+" python << EOF
+" def indent_markdown_list_item(direction=1):
+"     import vim
+"     buffer = vim.current.buffer
+"     (row, _) = vim.current.window.cursor
+"     row -= 1
+"     if not buffer[row]:
+"         return
+" 
+"     bullets = '-+*'
+"     leading_spaces = 0
+"     while buffer[row][leading_spaces] == ' ':
+"         leading_spaces += 1
+"     if buffer[row][leading_spaces] not in bullets:
+"         return
+"     level = (leading_spaces / 2) - 1
+"     new_bullet = bullets[(level + direction) % len(bullets)]
+"     spaces = ' ' * (leading_spaces + 2 * direction)
+"     buffer[row] = spaces + new_bullet + buffer[row][leading_spaces + 1:]
+" EOF

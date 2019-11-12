@@ -36,8 +36,14 @@ source $ZSH/oh-my-zsh.sh
 # Customize to your needs...
 # export PATH=~/bin:/opt/local/bin:/usr/local/bin:/Users/sergeio/bin:/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/opt/local/bin:/Users/sergeio/bin:/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin
 # export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/Current/bin:~/bin:/opt/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
-export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin:~/bin:/opt/local/bin:$PATH:/bin:/sbin
+export PATH=/usr/local/bin:/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin:~/bin:/opt/local/bin:$PATH:/bin:/sbin
+export PATH="/usr/local/opt/node@8/bin:$PATH"
 
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+
+if [ -f ~/bin/tmuxinator.zsh ]; then
+    source ~/bin/tmuxinator.zsh
+fi
 
 if [[ ! $TERM =~ screen ]]; then
     exec tmux

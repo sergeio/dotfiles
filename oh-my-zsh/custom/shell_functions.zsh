@@ -9,6 +9,25 @@ difiles () {
     git status --porcelain | awk '{print $2}'
 }
 
+g-() {
+    if [[ -z "$*" ]]; then
+        git checkout -
+    else
+        git checkout @{-$1}
+    fi
+}
+
+pg() {
+    (
+        cd ~/fun/funraise-orchestra;
+        if [[ $1 ]]; then
+            docker-compose exec platformdb psql -U postgres funraise -c "$1;"
+        else
+            docker-compose exec platformdb psql -U postgres funraise
+        fi
+    )
+}
+
 alarm () {
     osascript -e "set Volume 2.4"
     sleep_until $1
