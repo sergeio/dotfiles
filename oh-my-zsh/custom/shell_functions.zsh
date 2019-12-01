@@ -17,6 +17,87 @@ g-() {
     fi
 }
 
+gbrs () {
+    git branch |
+        sed 's/^[ *]//' |
+        grep -v -E '(master|develop)' |
+        xargs git --no-pager show --format='%at %h' --no-patch |
+        sort -n |
+        cut -d' ' -f 2 |
+        xargs git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar' --no-patch
+}
+
+gbrsm () {
+    git branch |
+        sed 's/^[ *]//' |
+        grep -v -E '(master|develop)' |
+        xargs git show --format='%at %h' --no-patch |
+        sort -n |
+        cut -d' ' -f 2 |
+        while read sha; do
+            # TODO: colors getting swallowed
+            line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset' --no-patch --color=always $sha)
+            m="[ ]"; if merged_into_develop $sha; then m="[m]" fi;
+            echo "$m $line";
+        done;
+}
+
+gbrsd () {
+    git branch |
+        sed 's/^[ *]//' |
+        grep -v -E '(master|develop)' |
+        xargs git show --format='%at %h' --no-patch |
+        sort -n |
+        cut -d' ' -f 2 |
+        while read sha; do
+            # TODO: colors getting swallowed
+            line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset' --no-patch --color=always $sha)
+            d="   "; if [[ $(deployed $sha) ]]; then d="[D]" fi;
+            echo "$d $line";
+        done;
+}
+
+delete_branch_push () {
+    git --no-pager show --oneline --no-patch &&
+        git branch --delete $1 &&
+        git push --delete origin $1
+}
+
+#find if two git commits are related
+ganc () {
+    if [ $# -ne 2 ]; then
+        echo usage: ${script_name} "<REV1> <REV2>"
+        return 2
+    fi
+    if $( git merge-base --is-ancestor $1 $2 ); then
+        echo "$1 is an ancestor of $2"
+        return 0
+    elif $( git merge-base --is-ancestor $2 $1 ); then
+        echo "$2 is an ancestor of $1"
+        return 0
+    else
+        echo "$1 and $2 are not related"
+        return 1
+    fi
+}
+
+deployed() {
+    if [ $# -ne 1 ]; then
+        echo usage: deployed "<commit_id>"
+        return 2
+    fi
+    for tag in `git tag | grep deployed`; do
+        if git merge-base --is-ancestor $1 $tag; then
+            echo "$1 was $tag"
+            return 0
+        fi
+    done
+}
+
+merged_into_develop() {
+    git merge-base --is-ancestor $1 develop
+}
+
 pg() {
     (
         cd ~/fun/funraise-orchestra;

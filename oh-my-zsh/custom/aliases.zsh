@@ -15,23 +15,21 @@ alias y='cd ~/Videos; url=$(pbpaste); echo $url; until ydl $url; do sleep 1; don
 # alias workoff='deactivate'
 alias tmux='tmux -2'
 alias j=z
-alias jj='cd ~/khan/webapp'
-alias v='vagrant'
-alias vs='vagrant status | grep -v -e "Current VM" -e "This environment" -e "above with" -e "VM, run" | sed "/^$/d" | sort'
-alias vss="vs | grep -v 'not created'"
-alias vsshh="ssh -q -F ./.ssh_config"
-alias vu='vagrant up'
-alias vd='vagrant destroy'
+# alias v='vagrant'
+# alias vs='vagrant status | grep -v -e "Current VM" -e "This environment" -e "above with" -e "VM, run" | sed "/^$/d" | sort'
+# alias vss="vs | grep -v 'not created'"
+# alias vsshh="ssh -q -F ./.ssh_config"
+# alias vu='vagrant up'
+# alias vd='vagrant destroy'
 alias dc='docker-compose'
 # alias updatedb='sudo /usr/libexec/locate.updatedb'
-alias t='./tools/runtests.py'
-alias tsat='./tools/runtests.py api.internal.test.sat_test sat'
+# alias t='./tools/runtests.py'
+# alias tsat='./tools/runtests.py api.internal.test.sat_test sat'
 
 alias gs=''
 
 alias g='git'
 alias gr="GIT_EDITOR=\"vim -c \\\"1,'}-1s/\n/\rx git diff origin\/master | pep8 --diff --count --exclude \\\"__init__.py\\\"\r/g | nohlsearch \\\"\" git rebase -i"
-alias gbrs="git branch | sed 's/^[ *]//' | grep -v -E '(master|develop)' | xargs git --no-pager show --format='%at %h' --no-patch | sort -n | cut -d' ' -f 2 | xargs git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar' --no-patch"
 
 alias mfiles='git diff master --name-only --diff-filter=ACMR'
 alias dlint='(mfiles | grep -v "^tests/" | grep ".py$" | xargs bin/pylint); (mfiles | grep "^tests/" | grep ".py$" | xargs bin/pylint | grep 'Unused')'

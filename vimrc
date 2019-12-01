@@ -14,8 +14,8 @@ set number "linenumbers
 set noerrorbells visualbell t_vb=
 
 " default to slate, but use wombad256 if it's available
-silent! colors slate
-silent! colors wombat256mod
+silent! colors jellybeans
+" silent! colors wombat256mod
 
 syntax on
 set antialias
@@ -28,6 +28,22 @@ set shiftwidth=4
 set nowrap
 set title
 set nopaste
+
+" Automatically read buffer from disk if unchanged
+" Poll for changes
+set autoread
+" autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif
+" autocmd FileChangedShellPost *
+"   \\ echohl WarningMsg | echo 'File changed on disk. Buffer reloaded.' | echohl None
+if ! exists('g:CheckUpdateStarted')
+    let g:CheckUpdateStarted=1
+    call timer_start(1,'CheckUpdate')
+endif
+function! CheckUpdate(timer)
+    checktime
+    " silent! checktime
+    call timer_start(1000,'CheckUpdate')
+endfunction
 
 autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2
 autocmd FileType scheme setlocal tabstop=2 softtabstop=2 shiftwidth=2
@@ -147,6 +163,7 @@ nnoremap <silent> <Space>k mxO<Esc>`x
 " keep at least 5 lines to the left/right, above/below
 set scrolloff=5
 set sidescrolloff=5
+set sidescroll=1
 
 set undolevels=1000                 "1000 undos
 

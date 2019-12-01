@@ -30,7 +30,5 @@
     unadd = reset head
     rim = rebase -i master
     s = status -s
-[kaclone]
-    email = sergei@khanacademy.org
 [core]
     excludesfile = /Users/sergeiorlov/.gitignore
