@@ -1,21 +1,21 @@
 call plug#begin('~/.vim/plugged')
-Plug 'nvie/vim-flake8', { 'for': 'python' }
+Plug 'tpope/vim-surround'
+Plug 'kien/ctrlp.vim'
+" Plug 'nvie/vim-flake8', { 'for': 'python' }
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-Plug 'kien/ctrlp.vim'
-Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
-Plug 'mxw/vim-jsx', { 'for': ['jsx', 'js'] }
-Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
-Plug 'peitalin/vim-jsx-typescript', { 'for': 'typescript' }
+" Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
+" Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
+" Plug 'peitalin/vim-jsx-typescript', { 'for': 'typescript' }
+Plug 'dense-analysis/ale'
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'yuezk/vim-js'
+Plug 'maxmellon/vim-jsx-pretty'
 " Plug 'jiangmiao/auto-pairs'
 call plug#end()
 
 set number "linenumbers
 set noerrorbells visualbell t_vb=
-
-" default to slate, but use wombad256 if it's available
-silent! colors jellybeans
-" silent! colors wombat256mod
 
 syntax on
 set antialias
@@ -28,6 +28,15 @@ set shiftwidth=4
 set nowrap
 set title
 set nopaste
+
+let g:ale_linters = {
+\   'javascript': ['eslint'],
+\   'typescript': ['tslint', 'tsserver'],
+\   'typescriptreact': ['tslint', 'tsserver'],
+\}
+nmap ,aa :ALEToggle<CR>
+nmap ,aj :ALENext<CR>
+nmap ,ak :ALEPrevious<CR>
 
 " Automatically read buffer from disk if unchanged
 " Poll for changes
@@ -195,6 +204,7 @@ map ,b :CtrlPBuffer<CR>
 map ,j :CtrlPLine<CR>
 map ,g :CtrlPTag<CR>
 nmap ,l :set list!<CR>
+nmap ,L yiwoconsole.log('!',);jkhPbi jkbllPk0wj
 nnoremap ,w :w\|make unit-test<cr>
 nnoremap ,ev :65vs $MYVIMRC<cr>
 nnoremap ,so :w\|source %\|nohlsearch<cr>
@@ -239,31 +249,7 @@ set listchars=tab:▸\ ,trail:‽ ",eol:¬
 " Ale is a linting plugin
 " let g:ale_linters = {'python': 'all'}
 " let g:ale_echo_msg_format = '[%linter%] %s'
-" highlight clear SignColumn
-
-"Invisible character colors
-highlight NonText guifg=#555555 ctermfg=238
-highlight SpecialKey guifg=#cd0000 
-
-"Highlight matching paren
-highlight MatchParen ctermbg=8
-
-"Highlight visual selection background dark-grey
-highlight Visual ctermbg=236 guibg=#444444
-
-"highlight current line
-set cul
-highlight CursorLine term=none cterm=none ctermbg=235
-
-" Untested diff highlighting
-highlight DiffAdd ctermbg=green
-highlight DiffDelete ctermbg=red
-highlight DiffChange ctermbg=yellow
-
-if exists("+colorcolumn")
-    set cc=80
-    highlight ColorColumn ctermbg=235 guibg=#222222
-endif
+highlight clear SignColumn
 
 " Fix clipboard for tmux on mac
 "set clipboard=unnamed "mac
@@ -291,43 +277,38 @@ function! Input()
     return text
 endfunction
 
-" python << EOF
-" def indent_and_wrap_paragraph():
-"     import vim
-"     buffer = vim.current.buffer
-"     vim.command('normal vipJ')
-"     (row, _) = vim.current.window.cursor
-" 
-"     print row
-" 
-"     if row < len(buffer) and buffer[row]:
-"         # For one-line "paragraphs", append a blank line to undo the `vipJ`
-"         buffer[row:row] = ['']
-" 
-"     while row <= len(buffer) and buffer[row - 1]:
-"         buffer[row - 1] = '    ' + buffer[row - 1].strip()
-"         vim.current.window.cursor = row, 0
-"         vim.command('normal gqlgqj')
-"         row += 1
-" EOF
-" 
-" python << EOF
-" def indent_markdown_list_item(direction=1):
-"     import vim
-"     buffer = vim.current.buffer
-"     (row, _) = vim.current.window.cursor
-"     row -= 1
-"     if not buffer[row]:
-"         return
-" 
-"     bullets = '-+*'
-"     leading_spaces = 0
-"     while buffer[row][leading_spaces] == ' ':
-"         leading_spaces += 1
-"     if buffer[row][leading_spaces] not in bullets:
-"         return
-"     level = (leading_spaces / 2) - 1
-"     new_bullet = bullets[(level + direction) % len(bullets)]
-"     spaces = ' ' * (leading_spaces + 2 * direction)
-"     buffer[row] = spaces + new_bullet + buffer[row][leading_spaces + 1:]
-" EOF
+
+" Colors
+
+silent! colors slate
+silent! colors jellybeans
+silent! colors jellybeansmod
+" silent! colors corvine
+" silent! colors wombat256mod
+
+" hi clear SpellBad
+" hi SpellBad cterm=underline
+
+"Invisible character colors
+highlight NonText guifg=#555555 ctermfg=238
+highlight SpecialKey guifg=#cd0000 
+
+"Highlight matching paren
+highlight MatchParen ctermbg=8
+
+"Highlight visual selection background dark-grey
+highlight Visual ctermbg=236 guibg=#444444
+
+"highlight current line
+set cul
+highlight CursorLine term=none cterm=none ctermbg=235
+
+" Untested diff highlighting
+" highlight DiffAdd ctermbg=green
+" highlight DiffDelete ctermbg=red
+" highlight DiffChange ctermbg=yellow
+
+if exists("+colorcolumn")
+    set cc=80
+    highlight ColorColumn ctermbg=235 guibg=#222222
+endif

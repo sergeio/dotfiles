@@ -1,5 +1,4 @@
 alias search='grep -r -i --binary-files=without-match'
-alias agg='ag --ignore tags'
 alias agt="ag --ignore=third_party --ignore=tags --ignore='*_test.*'"
 alias ag='ag --ignore=third_party --ignore=tags --ignore=dist --ignore="*min.js" --ignore=junit.xml --ignore="*.min.css"'
 alias agp="ag --ignore=third_party --ignore=tags --ignore=third_party --ignore='*.(js)(jsx)(html)(less)(css)'"
@@ -30,6 +29,7 @@ alias gs=''
 
 alias g='git'
 alias gr="GIT_EDITOR=\"vim -c \\\"1,'}-1s/\n/\rx git diff origin\/master | pep8 --diff --count --exclude \\\"__init__.py\\\"\r/g | nohlsearch \\\"\" git rebase -i"
+alias grecent="git --no-pager log --pretty=format:'%C(yellow)%h %Creset%s %C(dim)%ar%Creset' --all --since=2.weeks.ago --author=Sergei"
 
 alias mfiles='git diff master --name-only --diff-filter=ACMR'
 alias dlint='(mfiles | grep -v "^tests/" | grep ".py$" | xargs bin/pylint); (mfiles | grep "^tests/" | grep ".py$" | xargs bin/pylint | grep 'Unused')'

@@ -1,8 +1,103 @@
+kill_java_port() {
+    lsof -i :$1 | grep java | awk '{print $2}' | xargs kill -15
+}
+
+gch_fun() {
+    branch=$1
+    find $FUNRAISE -type d -depth 1 -name 'funraise*' | parallel '
+        dir={}
+        if (cd $dir && git fetch origin &&
+                git checkout '$branch' && git pull) &> /dev/null; then
+            echo OK $dir
+        else
+            echo ERR $dir
+        fi
+    '
+}
+
+gch_fun_2() {
+    branch=$1
+    find $FUNRAISE -type d -depth 1 -name 'funraise*' \
+        | while read dir; do
+            (
+                if (cd $dir && git fetch origin && git checkout $branch) > /dev/null 2>&1; then
+                    echo OK $dir
+                else
+                    echo ERR $dir
+                fi &
+                pid=$!
+            )
+        done
+
+    wait $pid
+}
+
+notify() {
+    msg="$1"
+    osascript -e 'display notification "'$msg'" with title "Script completed" sound name "Ping"';
+}
+
 f () {
     find . -iname $(sed 's/\(.\)/\1*/g' <<< $1) \
         -not \( -path './genfiles/*' -prune \) \
         -not \( -path './.git/*' -prune \) \
         -not \( -name '*.pyc' \)
+}
+
+agb () {
+    regex=$1
+    shift
+    ag "\b$regex\b" $*
+}
+
+restart_platform_ui () {
+    tmux send-keys -t funraise:ui.0 "C-c"
+    tmux send-keys -t funraise:ui.0 "source env.dev.sh && npm run start:redux-debug platform"
+    tmux send-keys -t funraise:ui.0 "Enter"
+}
+
+restart_platform_api () {
+    tmux send-keys -t funraise:platform.0 "C-z"
+    tmux send-keys -t funraise:platform.0 "kill %%"
+    tmux send-keys -t funraise:platform.0 "Enter"
+    tmux send-keys -t funraise:platform.0 "_restart_platform_helper $1"
+    tmux send-keys -t funraise:platform.0 "Enter"
+}
+
+_restart_platform_helper() {
+    source ~/.zshrc
+    kill_java_port 5005
+    kill_java_port 9000
+
+    until ! lsof -i :5005 | grep java; do
+        kill_java_port 5005
+        sleep .5
+    done
+
+    until ! lsof -i :9000 | grep java; do
+        kill_java_port 9000
+        sleep .5
+    done
+    [[ $1 == 'clean' ]] && echo " sbt clean" && sbt clean
+    date
+    source env.sh && ./funraise -Dconfig.resource=dynos/dev_env.conf -jvm-debug 5005 "run 9000 -mem 2048"
+}
+
+
+reset_elasticsearch_2() {
+    if [ -z "$FUNRAISE" ]
+    then
+        echo "Environment variable FUNRAISE must be set to directory containing your orchestra and elasticsearch repos"
+        return -1;
+    fi
+    cd $FUNRAISE/funraise-elasticsearch;
+    ./elasticsearch/build-scripts/setup_cluster.sh delete;
+    cd $FUNRAISE/funraise-orchestra;
+    docker-compose stop logstash;
+    cd $FUNRAISE/funraise-elasticsearch;
+    rm logstash/pipeline/jdbc-last-run/.platform*;
+    cd $FUNRAISE/funraise-orchestra;
+    docker-compose up -d logstash
 }
 
 difiles () {
@@ -24,7 +119,7 @@ gbrs () {
         xargs git --no-pager show --format='%at %h' --no-patch |
         sort -n |
         cut -d' ' -f 2 |
-        xargs git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar' --no-patch
+        xargs git --no-pager show --format='%C(dim)%Cred%h%Creset %C(green)%D %Creset%s %C(dim)%Cblue%ar' --no-patch
 }
 
 gbrsm () {
@@ -35,11 +130,25 @@ gbrsm () {
         sort -n |
         cut -d' ' -f 2 |
         while read sha; do
-            # TODO: colors getting swallowed
             line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset' --no-patch --color=always $sha)
             m="[ ]"; if merged_into_develop $sha; then m="[m]" fi;
             echo "$m $line";
         done;
+}
+
+gbrsm_p () {
+    git branch |
+        sed 's/^[ *]//' |
+        grep -v -E '(master|develop)' |
+        xargs git show --format='%at %h' --no-patch |
+        sort -n |
+        cut -d' ' -f 2 |
+        parallel -j 0 '
+            sha={}
+            line=$(git --no-pager show --format="%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset" --no-patch --color=always $sha)
+            m="[ ]"; if git merge-base --is-ancestor $sha develop; then m="[m]" fi;
+            echo "$m $line";
+        '
 }
 
 gbrsd () {
@@ -50,11 +159,31 @@ gbrsd () {
         sort -n |
         cut -d' ' -f 2 |
         while read sha; do
-            # TODO: colors getting swallowed
             line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset' --no-patch --color=always $sha)
             d="   "; if [[ $(deployed $sha) ]]; then d="[D]" fi;
             echo "$d $line";
         done;
+}
+
+gbrsd_p () {
+    git branch |
+        sed 's/^[ *]//' |
+        grep -v -E '(master|develop)' |
+        xargs git show --format='%at %h' --no-patch |
+        sort -n |
+        cut -d' ' -f 2 |
+        parallel -j 0 '
+            sha={}
+            line=$(git --no-pager show --format="%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset" --no-patch --color=always $sha)
+            d="   ";
+            for tag in `git tag | grep deployed`; do
+                if git merge-base --is-ancestor $sha $tag; then
+                    d="[D]"
+                    break
+                fi
+            done
+            echo "$d $line";
+        '
 }
 
 delete_branch_push () {
@@ -101,10 +230,11 @@ merged_into_develop() {
 pg() {
     (
         cd ~/fun/funraise-orchestra;
+        db=funraise; if [[ $2 ]]; then db=$2; fi
         if [[ $1 ]]; then
-            docker-compose exec platformdb psql -U postgres funraise -c "$1;"
+            docker-compose exec platformdb psql -U postgres $db -c "$1;"
         else
-            docker-compose exec platformdb psql -U postgres funraise
+            docker-compose exec platformdb psql -U postgres $db
         fi
     )
 }
@@ -359,6 +489,11 @@ function percent_charge () {
 
     percent=`echo "$current_charge/$total_charge * 100" | bc -l | cut -d '.' -f 1`
     echo $percent%
+}
+
+
+function top_process() {
+    ps -eo comm=,%cpu= -r | head -1
 }
 
 function eg(){
