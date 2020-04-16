@@ -24,6 +24,30 @@ set nowrap
 set title
 set nopaste
 
+" keep at least 5 lines to the left/right, above/below
+set scrolloff=5
+set sidescrolloff=5
+set sidescroll=1
+
+set undolevels=1000                 "1000 undos
+
+"Don't want backup files
+set nobackup
+set nowritebackup
+set noswapfile
+
+set nosmartindent
+set tags=tags,./tags,~/fun/tags
+filetype plugin indent on
+
+" Use the same symbols as TextMate for tabstops and EOLs
+set list
+set listchars=tab:▸\ ,trail:‽ ",eol:¬
+
+" Fix clipboard for tmux on mac
+set clipboard^=unnamed,unnamedplus "'nix
+
+" Ale is a linting plugin
 let g:ale_linters = {
 \   'javascript': ['eslint'],
 \   'typescript': ['tslint', 'tsserver'],
@@ -32,6 +56,9 @@ let g:ale_linters = {
 nmap ,aa :ALEToggle<CR>
 nmap ,aj :ALENext<CR>
 nmap ,ak :ALEPrevious<CR>
+
+let g:ale_echo_msg_format = '[%linter%] %code%: %s'
+highlight clear SignColumn
 
 " Automatically read buffer from disk if unchanged
 " Poll for changes
@@ -45,13 +72,11 @@ function! CheckUpdate(timer)
     if !bufexists("[Command Line]")
         checktime
     endif
-    " silent! checktime
     call timer_start(1000,'CheckUpdate')
 endfunction
 
 autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2
 autocmd FileType scheme setlocal tabstop=2 softtabstop=2 shiftwidth=2
-" autocmd FileType javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " searching:
 set incsearch
@@ -71,9 +96,6 @@ imap JK <esc>
 imap Jk <esc>
 imap <c-a> <c-o>I
 imap <c-e> <c-o>A
-
-"mouse support
-"set mouse=a
 
 "Disable accidentally scrolling on the touchpad when typing
 "(tmux maps scrolling to arrow keys when mouse=off,
@@ -117,21 +139,10 @@ nnoremap <silent> <Space><Space> :nohlsearch<Bar>:echo<CR>
 "
 " Easy normal-mode linen wrapping
 nnoremap <silent> <CR> i<CR><esc>l
-"
-" pdb mapping
-nmap \b mxoimport pdb; pdb.set_trace()<esc>`x
-
-" Convert an a/b fraction into \frac{a}/{b}
-nmap ,f i\frac{jklxf/Pf/s{jklxhEa}jkww
 
 " pprint mapping
 nmap \\p :s/\vprint (.*)/pprint\(\1\)<CR>mxOfrom pprint import pprint<esc>`x
 nmap \\P :s/\vpprint\((.*)\)/print \1/<CR>kdd
-
-" turn line into markdown link
-" nmap ,k 0y$i[jkA](jkpA)jk
-nmap ,K 0y$i[jkA](jkpA)jkI  * <esc>lci[
-nmap ,k O<esc>:.!link_extractor<CR>
 
 " forgot sudo?
 cmap W!! %!sudo tee > /dev/null %
@@ -139,9 +150,9 @@ cmap W!! %!sudo tee > /dev/null %
 " Emacs bindings in command line mode
 cnoremap <c-a> <home>
 cnoremap <c-e> <end>
+cnoremap <c-f> <right>
+cnoremap <c-b> <left>
 
-" map _ :s/\\v^(\\s*)# /\\1/<cr>:nohlsearch<cr>
-" map - :s/\\v^(\\s*)(.+)/\\1# \\2/<cr>:nohlsearch<cr>
 map - gc
 map _ gc
 
@@ -158,25 +169,9 @@ endfunction
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 inoremap <s-tab> <c-n>
 
-" Use sane regexes.
-" nnoremap / /\\v
-" vnoremap / /\\v
-
 " Create newlines and stay in Normal Mode
 nnoremap <silent> <Space>j mxo<Esc>`x
 nnoremap <silent> <Space>k mxO<Esc>`x
-
-" keep at least 5 lines to the left/right, above/below
-set scrolloff=5
-set sidescrolloff=5
-set sidescroll=1
-
-set undolevels=1000                 "1000 undos
-
-"Don't want backup files
-set nobackup
-set nowritebackup
-set noswapfile
 
 " if executable("ag")
 "     let g:ctrlp_user_command = "ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g '' | python -c 'import sys; print \\"\\".join(sorted(sys.stdin, key=lambda l: len(l)))'"
@@ -190,7 +185,7 @@ set noswapfile
 "         \\ 'fallback': 'find %s -type f'
 "     \\ }
 " endif
-"
+
 
 let g:ctrlp_user_command = "ag %s -i --nocolor --nogroup --ignore ''.git'' --ignore ''genfiles'' --hidden -g '' | awk '{ print length, $0 }' | sort -n -s | cut -d' ' -f2-"
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:50'
@@ -206,8 +201,6 @@ nnoremap ,w :w\|make unit-test<cr>
 nnoremap ,ev :65vs $MYVIMRC<cr>
 nnoremap ,so :w\|source %\|nohlsearch<cr>
 nnoremap ,S :set spell!<CR>
-
-set tags=tags,./tags,~/fun/tags
 
 " Remove all trailing whitespace in file
 nmap ,ss :%s/ \+$//<CR>
@@ -236,22 +229,6 @@ nmap ,d o<CR>                                  ...........<CR><esc>
 
 nmap ,v :s/TODO/✓ DONE/<CR>:nohlsearch<Bar>:echo<CR>
 
-filetype plugin indent on
-set nosmartindent
-
-" Use the same symbols as TextMate for tabstops and EOLs
-set list
-set listchars=tab:▸\ ,trail:‽ ",eol:¬
-
-" Ale is a linting plugin
-" let g:ale_linters = {'python': 'all'}
-" let g:ale_echo_msg_format = '[%linter%] %s'
-highlight clear SignColumn
-
-" Fix clipboard for tmux on mac
-"set clipboard=unnamed "mac
-set clipboard^=unnamed,unnamedplus "'nix
-
 "Macvim remove toolbar
 if has("gui_running")
     set guifont=Droid\ Sans\ Mono:h14
@@ -259,10 +236,6 @@ if has("gui_running")
 endif
 
 imap IFF if __name__ == '__main__':<CR>main()<ESC>kOdef main():<CR>
-
-map ,q <esc>:python indent_and_wrap_paragraph()<CR>
-map ,. <esc>:python indent_markdown_list_item(1)<CR>
-map ,, <esc>:python indent_markdown_list_item(-1)<CR>
 
 " Can use this Input function to pause macros by going into insert mode,
 " ^r=Input()
@@ -274,17 +247,11 @@ function! Input()
     return text
 endfunction
 
-
 " Colors
 
 silent! colors slate
 silent! colors jellybeans
 silent! colors jellybeansmod
-" silent! colors corvine
-" silent! colors wombat256mod
-
-" hi clear SpellBad
-" hi SpellBad cterm=underline
 
 "Invisible character colors
 highlight NonText guifg=#555555 ctermfg=238
@@ -299,11 +266,6 @@ highlight Visual ctermbg=236 guibg=#444444
 "highlight current line
 set cul
 highlight CursorLine term=none cterm=none ctermbg=235
-
-" Untested diff highlighting
-" highlight DiffAdd ctermbg=green
-" highlight DiffDelete ctermbg=red
-" highlight DiffChange ctermbg=yellow
 
 if exists("+colorcolumn")
     set cc=80
