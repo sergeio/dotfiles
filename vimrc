@@ -1,17 +1,12 @@
 call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-surround'
 Plug 'kien/ctrlp.vim'
-" Plug 'nvie/vim-flake8', { 'for': 'python' }
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-" Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
-" Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
-" Plug 'peitalin/vim-jsx-typescript', { 'for': 'typescript' }
 Plug 'dense-analysis/ale'
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'yuezk/vim-js'
 Plug 'maxmellon/vim-jsx-pretty'
-" Plug 'jiangmiao/auto-pairs'
 call plug#end()
 
 set number "linenumbers
@@ -41,15 +36,15 @@ nmap ,ak :ALEPrevious<CR>
 " Automatically read buffer from disk if unchanged
 " Poll for changes
 set autoread
-" autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif
-" autocmd FileChangedShellPost *
-"   \\ echohl WarningMsg | echo 'File changed on disk. Buffer reloaded.' | echohl None
 if ! exists('g:CheckUpdateStarted')
     let g:CheckUpdateStarted=1
     call timer_start(1,'CheckUpdate')
 endif
 function! CheckUpdate(timer)
-    checktime
+    " checktime errors if the command-line history window is open
+    if !bufexists("[Command Line]")
+        checktime
+    endif
     " silent! checktime
     call timer_start(1000,'CheckUpdate')
 endfunction
@@ -87,6 +82,8 @@ inoremap <up> <Nop>
 inoremap <down> <Nop>
 noremap <up> <Nop>
 noremap <down> <Nop>
+
+noremap q: <Nop>
 
 "tab completion of filenames fix (from allanc)
 set wildmode=longest,list,full
