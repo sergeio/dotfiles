@@ -7,9 +7,15 @@ Plug 'dense-analysis/ale'
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'yuezk/vim-js'
 Plug 'maxmellon/vim-jsx-pretty'
+" Syntax highlighting for ftl files:
+Plug 'andreshazard/vim-freemarker'
+" ag integration
+Plug 'dyng/ctrlsf.vim'
+Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 call plug#end()
 
-set number "linenumbers
+" set number "linenumbers
+set nonu
 set noerrorbells visualbell t_vb=
 
 syntax on
@@ -47,18 +53,31 @@ set listchars=tab:▸\ ,trail:‽ ",eol:¬
 " Fix clipboard for tmux on mac
 set clipboard^=unnamed,unnamedplus "'nix
 
+" Make mksession work the way I expect
+set ssop-=options    " do not store global and local values in a session
+set ssop-=folds      " do not store folds
+
 " Ale is a linting plugin
 let g:ale_linters = {
 \   'javascript': ['eslint'],
 \   'typescript': ['tslint', 'tsserver'],
 \   'typescriptreact': ['tslint', 'tsserver'],
 \}
+let g:ale_pattern_options = {
+\ '\.d\.ts$': {'ale_linters': ['tslint', 'tsserver'], 'ale_fixers': []},
+\ }
+" If you configure g:ale_pattern_options outside of vimrc, you need this.
+let g:ale_pattern_options_enabled = 1
+
 nmap ,aa :ALEToggle<CR>
 nmap ,aj :ALENext<CR>
 nmap ,ak :ALEPrevious<CR>
 
 let g:ale_echo_msg_format = '[%linter%] %code%: %s'
 highlight clear SignColumn
+
+let g:prettier#exec_cmd_async = 1
+autocmd BufWritePre *.{js,jsx,ts,tsx,html} Prettier
 
 " Automatically read buffer from disk if unchanged
 " Poll for changes
@@ -105,7 +124,7 @@ inoremap <down> <Nop>
 noremap <up> <Nop>
 noremap <down> <Nop>
 
-noremap q: <Nop>
+" noremap q: <Nop>
 
 "tab completion of filenames fix (from allanc)
 set wildmode=longest,list,full
@@ -119,8 +138,8 @@ set complete=.,w,b,u,U,t
 set hidden
 
 " Change buffers easily
-map <C-j> :bnext<CR>
-map <C-k> :bprev<CR>
+map <C-b><C-n> :bnext<CR>
+map <C-b><C-p> :bprev<CR>
 
 "Close a buffer without closing the window associated with it - plugin/Kwbd.vim
 command! Bclose Kwbd
@@ -196,11 +215,22 @@ map ,b :CtrlPBuffer<CR>
 map ,j :CtrlPLine<CR>
 map ,g :CtrlPTag<CR>
 nmap ,l :set list!<CR>
+nmap ,cl :CtrlPClearCache<CR>
 nmap ,L yiwoconsole.log('!',);jkhPbi jkbllPk0wj
 nnoremap ,w :w\|make unit-test<cr>
 nnoremap ,ev :65vs $MYVIMRC<cr>
 nnoremap ,so :w\|source %\|nohlsearch<cr>
 nnoremap ,S :set spell!<CR>
+nmap ,f :CtrlSF 
+
+let g:ctrlsf_search_mode = 'async'
+let g:ctrlsf_mapping = {
+    \ "vsplit": { "key": "o" },
+    \ "open": { "key": "" },
+    \ }
+let g:ctrlsf_auto_focus = {
+    \ "at": "start"
+    \ }
 
 " Remove all trailing whitespace in file
 nmap ,ss :%s/ \+$//<CR>

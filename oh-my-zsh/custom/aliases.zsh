@@ -1,6 +1,6 @@
 alias search='grep -r -i --binary-files=without-match'
 alias agt="ag --ignore=third_party --ignore=tags --ignore='*_test.*'"
-alias ag='ag --ignore=third_party --ignore=tags --ignore=dist --ignore="*min.js" --ignore=junit.xml --ignore="*.min.css"'
+alias ag='ag --ignore=third_party --ignore=tags --ignore=dist --ignore="*min.js" --ignore=junit.xml --ignore="*.min.css" --ignore=stats'
 alias agp="ag --ignore=third_party --ignore=tags --ignore=third_party --ignore='*.(js)(jsx)(html)(less)(css)'"
 
 # alias ydl="youtube-dl -f 'bestvideo[height<=720][fps<=30]+bestaudio/best'"

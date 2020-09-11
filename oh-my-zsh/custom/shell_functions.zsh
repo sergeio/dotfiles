@@ -80,7 +80,7 @@ _restart_platform_helper() {
     done
     [[ $1 == 'clean' ]] && echo " sbt clean" && sbt clean
     date
-    source env.sh && ./funraise -Dconfig.resource=dynos/dev_env.conf -jvm-debug 5005 "run 9000 -mem 2048"
+    ./funraise
 }
 
 
@@ -99,6 +99,44 @@ reset_elasticsearch_2() {
     cd $FUNRAISE/funraise-orchestra;
     docker-compose up -d logstash
 }
+
+backup_local_database() {
+    database=${1:=funraise}
+    CONTAINER="funraise-orchestra_platformdb_1"
+    now="$(date +"%m-%d-%Y_%H-%M")"
+    OUTPUT_DIR=~/Documents/funraise/db_backup/
+    mkdir -p "$OUTPUT_DIR"
+    BACKUP_FILENAME="${database}_$now".dump
+    OUTPUT_FILE=$OUTPUT_DIR/$BACKUP_FILENAME
+    docker exec $CONTAINER bash -c "pg_dump -F c -O $database -p 5432 -U postgres > /root/$BACKUP_FILENAME"
+    docker cp $CONTAINER:/root/$BACKUP_FILENAME $OUTPUT_DIR
+    docker exec $CONTAINER rm /root/$BACKUP_FILENAME
+    echo "backed up $database to $OUTPUT_FILE"
+}
+
+backup_all_local_databases() {
+    backup_local_database funraise;
+    backup_local_database funraise-billing;
+    backup_local_database funraise-features;
+    backup_local_database funraise-payments;
+    notify "backups done"
+}
+
+restore_local_database() {
+    if [[ $# -ne 2 ]] ; then
+        echo "restore_database takes two arguements: database name and input file"
+    return 1
+    fi
+    DB_NAME="$1"
+    INPUT_FILE="$2"
+    dropdb -U postgres -h platformdb -p 5432 "$DB_NAME"
+    createdb -U postgres -h platformdb -p 5432 -T template0 "$DB_NAME"
+    pushd ~/workspace/funraise-orchestra
+    docker exec -i "funraise-orchestra_platformdb_1" pg_restore --clean --no-acl --no-owner -U "postgres" -d "$DB_NAME" < "$INPUT_FILE";
+    popd;
+}
+
+
 
 difiles () {
     git status --porcelain | awk '{print $2}'
@@ -119,10 +157,11 @@ gbrs () {
         xargs git --no-pager show --format='%at %h' --no-patch |
         sort -n |
         cut -d' ' -f 2 |
-        xargs git --no-pager show --format='%C(dim)%Cred%h%Creset %C(green)%D %Creset%s %C(dim)%Cblue%ar' --no-patch
+        xargs git --no-pager show --format='%C(dim)%Cred%h%Creset %C(green)%D %Creset%s %C(dim)%Cblue%ar %an' --no-patch
 }
 
 gbrsm () {
+    ancestor=${1:-develop}
     git branch |
         sed 's/^[ *]//' |
         grep -v -E '(master|develop)' |
@@ -130,13 +169,14 @@ gbrsm () {
         sort -n |
         cut -d' ' -f 2 |
         while read sha; do
-            line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset' --no-patch --color=always $sha)
-            m="[ ]"; if merged_into_develop $sha; then m="[m]" fi;
+            line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %an%Creset' --no-patch --color=always $sha)
+            m="[ ]"; if git merge-base --is-ancestor $sha $ancestor; then m="[m]" fi;
             echo "$m $line";
         done;
 }
 
 gbrsm_p () {
+    ancestor=${1:-develop}
     git branch |
         sed 's/^[ *]//' |
         grep -v -E '(master|develop)' |
@@ -145,8 +185,10 @@ gbrsm_p () {
         cut -d' ' -f 2 |
         parallel -j 0 '
             sha={}
-            line=$(git --no-pager show --format="%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset" --no-patch --color=always $sha)
-            m="[ ]"; if git merge-base --is-ancestor $sha develop; then m="[m]" fi;
+            line=$(git --no-pager show --format="%Cred%h %Cgreen%D %Creset%s %Cblue%ar %an%Creset" --no-patch --color=always $sha)
+            '"
+            m='[ ]'; if git merge-base --is-ancestor \$sha $ancestor; then m='[m]' fi;
+            "'
             echo "$m $line";
         '
 }
@@ -159,7 +201,7 @@ gbrsd () {
         sort -n |
         cut -d' ' -f 2 |
         while read sha; do
-            line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset' --no-patch --color=always $sha)
+            line=$(git --no-pager show --format='%Cred%h %Cgreen%D %Creset%s %Cblue%ar %an%Creset' --no-patch --color=always $sha)
             d="   "; if [[ $(deployed $sha) ]]; then d="[D]" fi;
             echo "$d $line";
         done;
@@ -174,7 +216,7 @@ gbrsd_p () {
         cut -d' ' -f 2 |
         parallel -j 0 '
             sha={}
-            line=$(git --no-pager show --format="%Cred%h %Cgreen%D %Creset%s %Cblue%ar %Creset" --no-patch --color=always $sha)
+            line=$(git --no-pager show --format="%Cred%h %Cgreen%D %Creset%s %Cblue%ar %an%Creset" --no-patch --color=always $sha)
             d="   ";
             for tag in `git tag | grep deployed`; do
                 if git merge-base --is-ancestor $sha $tag; then

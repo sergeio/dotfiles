@@ -478,7 +478,7 @@ call s:X("AleErrorSign","bbbbbb","4c0303","","","DarkRed")
 call s:X("Title","70b950","","bold","Green","")
 
 call s:X("Constant","cf6a4c","","","Red","")
-call s:X("Special","799d6a","","","Green","")
+call s:X("Special","8fbfdc","","","Green","")
 call s:X("Delimiter","668799","","","Grey","")
 
 call s:X("String","99ad6a","","","Green","")
