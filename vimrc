@@ -12,12 +12,17 @@ Plug 'andreshazard/vim-freemarker'
 " ag integration
 Plug 'dyng/ctrlsf.vim'
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+" Syntax highlighting for many languages:
+Plug 'sheerun/vim-polyglot'
 call plug#end()
 
 " set number "linenumbers
 set nonu
 set noerrorbells visualbell t_vb=
 
+" The new regex engine makes vim feel slow when adding new lines to >100 line
+" files with syntax highlighting on.
+set regexpengine=1
 syntax on
 set antialias
 set t_Co=256
@@ -282,16 +287,14 @@ endfunction
 silent! colors slate
 silent! colors jellybeans
 silent! colors jellybeansmod
+silent! colors corvinemod
 
 "Invisible character colors
 highlight NonText guifg=#555555 ctermfg=238
 highlight SpecialKey guifg=#cd0000 
 
-"Highlight matching paren
+" "Highlight matching paren
 highlight MatchParen ctermbg=8
-
-"Highlight visual selection background dark-grey
-highlight Visual ctermbg=236 guibg=#444444
 
 "highlight current line
 set cul

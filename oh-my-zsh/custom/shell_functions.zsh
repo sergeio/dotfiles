@@ -65,7 +65,8 @@ restart_platform_api () {
 }
 
 _restart_platform_helper() {
-    source ~/.zshrc
+    # Can't source because it'll reset the sdkman java version to 8
+    # source ~/.zshrc
     kill_java_port 5005
     kill_java_port 9000
 
@@ -80,6 +81,7 @@ _restart_platform_helper() {
     done
     [[ $1 == 'clean' ]] && echo " sbt clean" && sbt clean
     date
+    java -version
     ./funraise
 }
 
