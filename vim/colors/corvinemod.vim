@@ -243,7 +243,7 @@ if s:t_Co >= 256
   hi DiffText ctermfg=180 ctermbg=238 cterm=NONE
   hi Comment ctermfg=242 ctermbg=NONE cterm=italic
   hi Constant ctermfg=186 ctermbg=NONE cterm=NONE
-  hi Error ctermfg=235 ctermbg=174 cterm=NONE
+  hi Error ctermfg=174 ctermbg=NONE cterm=underline
   hi Identifier ctermfg=182 ctermbg=NONE cterm=NONE
   hi PreProc ctermfg=150 ctermbg=NONE cterm=NONE
   hi Special ctermfg=103 ctermbg=NONE cterm=NONE

@@ -481,7 +481,7 @@ on () { rprompt_on }
 off () { rprompt_off }
 
 rprompt() {
-    if [ -z "$IGNOREGIT" ]; then
+    if [ -z "$IGNOREGIT" ] && [ -d .git ]; then
         echo "$(check_git_status) $(parse_git_branch)"
     fi
 }
@@ -509,7 +509,7 @@ check_git_status() {
 
 parse_git_branch() {
     git branch --no-color 2> /dev/null |
-    sed -e '/^  /d' -e 's/* \(.*\)/\1/'
+        sed -e '/^  /d' -e 's/* \(.*\)/\1/'
 }
 
 get_exit_code_color() {

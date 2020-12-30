@@ -4,25 +4,22 @@ Plug 'kien/ctrlp.vim'
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'dense-analysis/ale'
-Plug 'HerringtonDarkholme/yats.vim'
-Plug 'yuezk/vim-js'
-Plug 'maxmellon/vim-jsx-pretty'
-" Syntax highlighting for ftl files:
-Plug 'andreshazard/vim-freemarker'
 " ag integration
 Plug 'dyng/ctrlsf.vim'
-Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'npm install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
 " Syntax highlighting for many languages:
 Plug 'sheerun/vim-polyglot'
+" Need yats and jsx-pretty to make string-literals not break highlighting
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'maxmellon/vim-jsx-pretty'
 call plug#end()
 
 " set number "linenumbers
 set nonu
 set noerrorbells visualbell t_vb=
 
-" The new regex engine makes vim feel slow when adding new lines to >100 line
-" files with syntax highlighting on.
-set regexpengine=1
 syntax on
 set antialias
 set t_Co=256
@@ -81,8 +78,15 @@ nmap ,ak :ALEPrevious<CR>
 let g:ale_echo_msg_format = '[%linter%] %code%: %s'
 highlight clear SignColumn
 
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
 let g:prettier#exec_cmd_async = 1
-autocmd BufWritePre *.{js,jsx,ts,tsx,html} Prettier
+" Prevent quickfix window from popping up when prettier fails parsing buffer
+let g:prettier#quickfix_enabled = 0
+" let g:prettier#exec_cmd_path = '/Users/sergei/bin/prettier80'
+let g:prettier#exec_cmd_path = '/usr/local/bin/prettier'
+" let g:prettier#exec_cmd_path = '/bin/cat'
+autocmd BufWritePre /Users/sergei/fun/funraise-ui/*.{js,jsx,ts,tsx} Prettier
 
 " Automatically read buffer from disk if unchanged
 " Poll for changes
@@ -99,8 +103,7 @@ function! CheckUpdate(timer)
     call timer_start(1000,'CheckUpdate')
 endfunction
 
-autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2
-autocmd FileType scheme setlocal tabstop=2 softtabstop=2 shiftwidth=2
+autocmd FileType html,scheme setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " searching:
 set incsearch
@@ -252,6 +255,11 @@ let vimclojure#ParenRainbow=1
 au BufRead,BufNewFile *.clj set filetype=clojure
 au BufRead,BufNewFile *.py set filetype=python
 
+" The new regex engine makes vim feel slow when adding new lines to >100 line
+" files with syntax highlighting on.
+autocmd BufRead,BufNewFile,BufEnter * set regexpengine=2
+autocmd BufRead,BufNewFile,BufEnter *.py setlocal regexpengine=1 syntax=on
+
 " Settings for vim-markdown
 let g:vim_markdown_folding_disabled=1
 
@@ -284,9 +292,7 @@ endfunction
 
 " Colors
 
-silent! colors slate
-silent! colors jellybeans
-silent! colors jellybeansmod
+silent! colors corvine
 silent! colors corvinemod
 
 "Invisible character colors

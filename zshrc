@@ -21,9 +21,13 @@ source $ZSH/oh-my-zsh.sh
 # PATH
 export PATH=/usr/local/bin:/opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin:~/bin:/opt/local/bin:$PATH:/bin:/sbin
 export PATH="/usr/local/opt/node@12/bin:$PATH"
+export LDFLAGS="-L/usr/local/opt/node@12/lib"
+export CPPFLAGS="-I/usr/local/opt/node@12/include"
+
 
 export NPM_TOKEN="c77a3e20-4165-443b-966e-cacf0e312779"
 export FUNRAISE="/Users/sergei/fun"
+export GOPATH="/Users/sergei/go"
 
 export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
@@ -50,3 +54,9 @@ export NVM_DIR="$HOME/.nvm"
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/Users/sergei/.sdkman"
 [[ -s "/Users/sergei/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/sergei/.sdkman/bin/sdkman-init.sh"
+
+export ASDF_DIR=$(brew --prefix asdf)
+# . $HOME/.asdf/asdf.sh
+# . $HOME/.asdf/completions/asdf.bash
+
+. /usr/local/opt/asdf/asdf.sh
