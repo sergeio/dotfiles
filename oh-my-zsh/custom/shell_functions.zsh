@@ -56,6 +56,12 @@ restart_platform_ui () {
     tmux send-keys -t funraise:ui.0 "Enter"
 }
 
+restart_platform_csv2 () {
+    tmux send-keys -t funraise:ui.3 "C-c"
+    tmux send-keys -t funraise:ui.3 "source env.dev.sh && npm run start campaign-site-v2"
+    tmux send-keys -t funraise:ui.3 "Enter"
+}
+
 restart_platform_api () {
     tmux send-keys -t funraise:platform.0 "C-z"
     tmux send-keys -t funraise:platform.0 "kill %%"
